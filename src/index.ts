@@ -108,7 +108,7 @@ async function getAppStoreReceipt() {
  * @throws An error if the app store receipt could not be fetched or parsed.
  */
 async function getRawAppStoreReceipt() {
-  const result: AppStoreReceipt = await ApphudModule.getRawReciept();
+  const result: string = await ApphudModule.getRawReciept();
   return result;
 }
 
