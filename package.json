@@ -1,6 +1,6 @@
 {
   "name": "@kirz/expo-apphud",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "AppHud wrapper for Expo",
   "main": "build/index.js",
   "types": "build/index.d.ts",
