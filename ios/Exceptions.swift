@@ -3,8 +3,8 @@ import ExpoModulesCore
 internal class ApphudException: Exception {
     private let errorDetail: String
 
-    init(info: String) {
-        self.errorDetail = info
+    init(message: String) {
+        self.errorDetail = message
         super.init()
     }
 
