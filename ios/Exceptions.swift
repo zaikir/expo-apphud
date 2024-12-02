@@ -1,6 +1,6 @@
 import ExpoModulesCore
 
-internal class CustomException: Exception {
+internal class ApphudException: Exception {
     private let errorDetail: String
 
     init(info: String) {
