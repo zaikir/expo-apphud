@@ -1,14 +1,14 @@
 import ExpoModulesCore
 
-internal class ApphudException: Exception {
-  private let errorMessage: String
+internal class CustomException: Exception {
+    private let errorDetail: String
 
-  init(message: String) {
-    self.errorMessage = message
-    super.init()
-  }
+    init(info: String) {
+        self.errorDetail = info
+        super.init()
+    }
 
-  override var reason: String {
-    return errorMessage
-  }
+    override var reason: String {
+        return errorDetail
+    }
 }
