@@ -111,23 +111,22 @@ public class ApphudModule: Module {
       }
     }
 
-
     AsyncFunction("getRawReciept") { (promise: Promise) in
       guard let receiptURL = Bundle.main.appStoreReceiptURL else {
-          print("No receipt URL found.")
-          promise.resolve(nil)
-          return
+        print("No receipt URL found.")
+        promise.resolve(nil)
+        return
       }
 
       do {
-          let receiptData = try Data(contentsOf: receiptURL)
-          let base64EncodedReceipt = receiptData.base64EncodedString(options: [])
-          promise.resolve(base64EncodedReceipt)
-          return
+        let receiptData = try Data(contentsOf: receiptURL)
+        let base64EncodedReceipt = receiptData.base64EncodedString(options: [])
+        promise.resolve(base64EncodedReceipt)
+        return
       } catch {
-          print("Failed to read receipt data: \(error)")
-          promise.resolve(nil)
-          return
+        print("Failed to read receipt data: \(error)")
+        promise.resolve(nil)
+        return
       }
     }
 
@@ -170,6 +169,44 @@ public class ApphudModule: Module {
         }
       } else {
         promise.reject(ApphudException(message: "Invalid provider"))
+      }
+    }
+
+    AsyncFunction("fetchPlacements") { () async throws -> [[String: Any]] in
+      return try await withCheckedThrowingContinuation { continuation in
+        Task { @MainActor in
+          Apphud.fetchPlacements { placements, error in
+            if let error = error {
+              continuation.resume(throwing: ApphudException(message: error.localizedDescription))
+            } else {
+              let dict = placements.map { placement in
+                var paywallDict: [String: Any] = [:]
+                if let paywall = placement.paywall {
+                  paywallDict = [
+                    "experimentName": paywall.experimentName,
+                    "identifier": paywall.identifier,
+                    "isDefault": paywall.isDefault,
+                    "json": paywall.json,
+                    "parentPaywallIdentifier": paywall.parentPaywallIdentifier,
+                    "placementIdentifier": paywall.placementIdentifier,
+                    "variationName": paywall.variationName,
+                    "products": paywall.products.compactMap { product in
+                      product.skProduct != nil
+                        ? DataTransformer.skProduct(product: product.skProduct!) : nil
+                    },
+                  ]
+
+                }
+                return [
+                  "experimentName": placement.experimentName,
+                  "identifier": placement.identifier,
+                  "paywall": paywallDict,
+                ]
+              }
+              continuation.resume(returning: dict)
+            }
+          }
+        }
       }
     }
 

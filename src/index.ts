@@ -1,4 +1,4 @@
-import ApphudModule from "./ApphudModule";
+import ApphudModule from './ApphudModule';
 
 /**
  * Starts the in-app purchases module with the provided API key and with the optional user ID.
@@ -98,7 +98,7 @@ async function getAppStoreReceipt() {
     const receipt = JSON.parse(json) as AppStoreReceipt;
     return receipt;
   } catch {
-    throw new Error("Failed to parse the app store receipt JSON.");
+    throw new Error('Failed to parse the app store receipt JSON.');
   }
 }
 
@@ -140,12 +140,12 @@ function setDeviceIdentifiers({
 }
 
 type ApphudAttributionProvider =
-  | "AppsFlyer"
-  | "Adjust"
-  | "Facebook"
-  | "Apple Ads Attribution"
-  | "Firebase"
-  | "Custom";
+  | 'AppsFlyer'
+  | 'Adjust'
+  | 'Facebook'
+  | 'Apple Ads Attribution'
+  | 'Firebase'
+  | 'Custom';
 
 /**
  * Submits attribution data to Apphud from your chosen attribution network provider.
@@ -158,9 +158,18 @@ type ApphudAttributionProvider =
 function addAttribution(
   data: Record<string, any>,
   provider: ApphudAttributionProvider,
-  identifier?: string,
+  identifier?: string
 ): Promise<void> {
   return ApphudModule.addAttribution(data, provider, identifier);
+}
+
+async function fetchPlacements() {
+  const res = (await ApphudModule.fetchPlacements()) as IapPlacement[];
+  const placements: Record<string, IapPlacement> = {};
+  for (const placement of res) {
+    placements[placement.identifier] = placement;
+  }
+  return placements;
 }
 
 export const InAppPurchases = {
@@ -178,6 +187,7 @@ export const InAppPurchases = {
   getUserId,
   setDeviceIdentifiers,
   addAttribution,
+  fetchPlacements,
 };
 
 type LocaleMap = {
@@ -263,4 +273,18 @@ type InAppPurchaseReceipt = {
   is_trial_period: string;
   is_in_intro_offer_period: string;
   promotional_offer_id?: string;
+};
+
+type IapPlacement = {
+  experimentName: string | null;
+  identifier: string;
+  paywall: {
+    experimentName: string | null;
+    identifier: string;
+    isDefault: boolean;
+    json: Record<string, unknown>;
+    parentPaywallIdentifier: string | null;
+    variationName: string | null;
+    products: IapProduct[];
+  };
 };
